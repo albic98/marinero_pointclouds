@@ -35,8 +35,7 @@ class PLYToPointCloud2(Node):
         }
         
         self.start_flag = 0
-        self.zone = 0
-        self.previous_zone = 0
+        self.current_zone = None
         self.pose_subsriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
@@ -44,29 +43,31 @@ class PLYToPointCloud2(Node):
     def odom_callback(self, msg):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
-
-        # if self.start_flag < 1:
-        #     self.start_flag += 1
-        #     if self.pose_y < 296.0:
-        #         self.zone = self.zone_A
-        #         self.get_logger().info("Opening zone A.")
-        #     elif 296.0 <= self.pose_y < 598.0:
-        #         self.zone = self.zone_B
-        #         self.get_logger().info("Opening zone B.")
-        #     else:
-        #         self.zone = self.zone_C
-        #         self.get_logger().info("Opening zone C.")
-        if self.pose_y < 296.0 and self.zone != self.zone_A:
-            self.zone = self.zone_A
-            self.get_logger().info("Opening zone A.")
-        elif 296.0 <= self.pose_y < 598.0 and self.zone != self.zone_B:
-            self.zone = self.zone_B
-            self.get_logger().info("Opening zone B.")
-        elif self.pose_y > 598.0 and self.zone != self.zone_C:
-            self.zone = self.zone_C
-            self.get_logger().info("Opening zone C.")
+            
+        zone_A_limit_1, zone_A_limit_2 = 250.0, 296.0
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 296.5, 598.0, 624.0
+        zone_C_limit = 598.5
+        zone_x_min, zone_x_max = -100, -95
         
-
+        x_pose_condition = zone_x_min < self.pose_x < zone_x_max
+        
+        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition:
+            if self.current_zone != self.zone_B:
+                self.switch_to_zone(self.zone_B, "Opening zone B.")
+                
+        elif self.pose_y < zone_A_limit_2 and self.current_zone != self.zone_A:
+            self.switch_to_zone(self.zone_A, "Opening zone A.")
+            
+        elif zone_B_limit_1 <= self.pose_y < zone_B_limit_2 and self.current_zone != self.zone_B:
+            self.switch_to_zone(self.zone_B, "Opening zone B.")
+            
+        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition:
+            if self.current_zone != self.zone_B:
+                self.switch_to_zone(self.zone_B, "Opening zone B.")
+                
+        elif self.pose_y > zone_C_limit and self.current_zone != self.zone_C:
+            self.switch_to_zone(self.zone_C, "Opening zone C.")
+        
         self.declare_parameter_if_not_declared("ply_file_path", self.zone["ply_file_path"])
         self.declare_parameter_if_not_declared("euler_angles", self.zone["euler_angles"])
         self.declare_parameter_if_not_declared("translation", self.zone["translation"])
@@ -78,9 +79,11 @@ class PLYToPointCloud2(Node):
         self.static_transform_publisher()
 
         self.publish_pointcloud()
-        
-        self.previous_zone = self.zone
-        
+
+    def switch_to_zone(self, new_zone, log_message):
+        self.current_zone = new_zone
+        self.get_logger().info(log_message)
+    
     def declare_parameter_if_not_declared(self, param_name, value):
         if not self.has_parameter(param_name):
             self.declare_parameter(param_name, value)

@@ -27,13 +27,13 @@ class PCDPublisher(Node):
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_500K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_10M_remapped.pcd",
             "euler_angles": [0.0, -0.135, -2.57],
-            "translation": [94.2, 297.05, 0.3],
+            "translation": [94.2, 297.05, 0.32],
         }
         self.zone_C = {
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_200K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd",
-            "euler_angles": [0.0, -0.135, -2.57],
-            "translation": [140.85, 598.8, 0.35],
+            "euler_angles": [0.0, 0.0, -2.57],
+            "translation": [140.85, 598.8, -0.12],
         }
         
         self.current_zone = None
@@ -51,25 +51,28 @@ class PCDPublisher(Node):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
         
-        if 250.0 <= self.pose_y < 296.0 and -100.0 < self.pose_x < -95.0:
-            if self.current_zone == self.zone_B:
-                pass
-            else:
+        zone_A_limit_1, zone_A_limit_2 = 250.0, 296.0
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 296.5, 598.0, 624.0
+        zone_C_limit = 598.5
+        zone_x_min, zone_x_max = -100, -95
+        
+        x_pose_condition = zone_x_min < self.pose_x < zone_x_max
+        
+        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition:
+            if self.current_zone != self.zone_B:
                 self.switch_to_zone(self.zone_B, "Opening zone B.")
                 
-        elif self.pose_y < 296.0 and self.current_zone != self.zone_A:
+        elif self.pose_y < zone_A_limit_2 and self.current_zone != self.zone_A:
             self.switch_to_zone(self.zone_A, "Opening zone A.")
             
-        elif 296.5 <= self.pose_y < 598.0 and self.current_zone != self.zone_B:
+        elif zone_B_limit_1 <= self.pose_y < zone_B_limit_2 and self.current_zone != self.zone_B:
             self.switch_to_zone(self.zone_B, "Opening zone B.")
             
-        elif 598.0 <= self.pose_y < 624.0 and -100.0 < self.pose_x < -95.0:
-            if self.current_zone == self.zone_B:
-                pass
-            else:
+        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition:
+            if self.current_zone != self.zone_B:
                 self.switch_to_zone(self.zone_B, "Opening zone B.")
                 
-        elif self.pose_y > 598.5 and self.current_zone != self.zone_C:
+        elif self.pose_y > zone_C_limit and self.current_zone != self.zone_C:
             self.switch_to_zone(self.zone_C, "Opening zone C.")
         
         self.declare_parameter_if_not_declared("reduced_pcd_file_path", self.current_zone["reduced_pcd_file_path"])

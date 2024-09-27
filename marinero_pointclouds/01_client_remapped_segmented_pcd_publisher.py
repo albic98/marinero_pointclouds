@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import time
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -46,12 +45,13 @@ class PublishPointCloudClient(Node):
         
         goal_msg = PublishPointCloud.Goal()
         goal_msg.zone_name = zone_name
-        self.pointcloud_client_.send_goal_async(goal_msg, feedback_callback = self.feedback_callback).add_done_callback(self.goal_response_callback)
+        self.pointcloud_client_.send_goal_async(goal_msg, feedback_callback=self.feedback_callback).add_done_callback(self.goal_response_callback)
     
     def goal_response_callback(self, future):
+        self.goal_handle = None
         self.goal_handle: ClientGoalHandle = future.result()
         if self.goal_handle.accepted:
-            self.get_logger().info("Goal accepted.")
+            self.get_logger().info(f"Goal accepted.")
             self.get_result_future = self.goal_handle.get_result_async().add_done_callback(self.goal_result_callback)
 
     def feedback_callback(self, feedback_msg):
@@ -67,8 +67,6 @@ class PublishPointCloudClient(Node):
             self.get_logger().info("Sending cancel request...")
             future = self.goal_handle.cancel_goal_async()
             future.add_done_callback(self.cancel_done_callback)
-        else:
-            self.get_logger().info("No goal to cancel.")
             
     def cancel_done_callback(self, future):
         cancel_response = future.result()

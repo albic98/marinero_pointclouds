@@ -48,13 +48,30 @@ class PCDPublisher(Node):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
 
-        # Detect zone changes
-        if self.pose_y < 296.0 and self.current_zone != self.zone_A:
+        zone_A_limit_1, zone_A_limit_2 = 250.0, 296.0
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 296.5, 598.0, 624.0
+        zone_C_limit = 598.5
+        zone_x_min, zone_x_max = -100, -95
+        
+        x_pose_condition = zone_x_min < self.pose_x < zone_x_max
+        
+        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition:
+            if self.current_zone != self.zone_B:
+                self.switch_to_zone(self.zone_B, "Opening zone B.")
+                
+        elif self.pose_y < zone_A_limit_2 and self.current_zone != self.zone_A:
             self.switch_to_zone(self.zone_A, "Opening zone A.")
-        elif 296.0 <= self.pose_y < 598.0 and self.current_zone != self.zone_B:
+            
+        elif zone_B_limit_1 <= self.pose_y < zone_B_limit_2 and self.current_zone != self.zone_B:
             self.switch_to_zone(self.zone_B, "Opening zone B.")
-        elif self.pose_y > 598.0 and self.current_zone != self.zone_C:
+            
+        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition:
+            if self.current_zone != self.zone_B:
+                self.switch_to_zone(self.zone_B, "Opening zone B.")
+                
+        elif self.pose_y > zone_C_limit and self.current_zone != self.zone_C:
             self.switch_to_zone(self.zone_C, "Opening zone C.")
+            
 
         self.declare_parameter_if_not_declared("reduced_pcd_file_path", self.current_zone["reduced_pcd_file_path"])
         self.declare_parameter_if_not_declared("pcd_file_path", self.current_zone["pcd_file_path"])
@@ -69,13 +86,11 @@ class PCDPublisher(Node):
         # Publish the new zone"s point clouds
         self.publish_current_zone_pcds()
 
-
     def switch_to_zone(self, new_zone, log_message):
         self.current_zone = new_zone
         self.reduced_pcd_published = False
         self.large_pcd_published = False
         self.get_logger().info(log_message)
-
 
     def publish_current_zone_pcds(self):
         if not self.reduced_pcd_published:

@@ -53,11 +53,19 @@ class PublishPointCloudServer(Node):
 
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
+
+        self.check_cancel_timer = None
         self.current_goal_handle = None
         
     def goal_callback(self, goal_request):
         self.get_logger().info(f"Received goal request for zone: {goal_request.zone_name}")
         if goal_request.zone_name in self.zones:
+            # Cancel the current goal if it exists
+            if self.current_goal_handle:
+                self.get_logger().info("Canceling the current goal before accepting a new one.")
+                self.current_goal_handle.abort()  # Use abort instead of canceled
+                self.current_goal_handle = None  # Clear the current goal handle
+
             return GoalResponse.ACCEPT
         self.get_logger().error("Invalid zone name.")
         return GoalResponse.REJECT
@@ -65,17 +73,13 @@ class PublishPointCloudServer(Node):
     def cancel_callback(self, goal_handle):
         self.get_logger().info("Received cancel request.")
         return CancelResponse.ACCEPT
-
+        
     async def execute_callback(self, goal_handle: ServerGoalHandle):
+        # Set the current goal handle
         self.current_goal_handle = goal_handle
+
         zone_name = goal_handle.request.zone_name
         zone_config = self.zones.get(zone_name)
-
-        if not zone_config:
-            # Abort if the zone is invalid
-            if not goal_handle.is_cancel_requested:
-                goal_handle.abort()
-            return PublishPointCloud.Result(success=False, message="Invalid zone.")
 
         self.get_logger().info(f"Publishing point cloud for zone: {zone_name}")
         
@@ -105,37 +109,50 @@ class PublishPointCloudServer(Node):
             if goal_handle.is_cancel_requested:
                 self.get_logger().info("Goal was canceled after reduced point cloud publication.")
                 goal_handle.canceled()
+                self.current_goal_handle = None  # Clear the current goal handle
                 return PublishPointCloud.Result(success=False, message="Goal was canceled.")
 
+            # Start the timer to check for cancel requests
+            self.cancel_check_timer = self.create_timer(0.1, lambda: self.check_cancel_condition(goal_handle))
             await self.publish_larger_pointcloud(zone_config["pcd_file_path"], goal_handle)
+        
+            # Stop the timer after processing is complete
+            self.cancel_check_timer.cancel()
             
             # Final check before marking success
-            if not goal_handle.is_cancel_requested:
-                goal_handle.succeed()
-                return PublishPointCloud.Result(success=True, message=f"Successfully published point cloud for {zone_name}.")
-            else:
-                # Goal was canceled during the larger point cloud publication
+            if goal_handle.is_cancel_requested:
                 self.get_logger().info("Goal was canceled during larger point cloud publication.")
                 goal_handle.canceled()
+                self.current_goal_handle = None  # Clear the current goal handle
                 return PublishPointCloud.Result(success=False, message="Goal was canceled.")
+            else:
+                goal_handle.succeed()
+                self.current_goal_handle = None  # Clear the current goal handle
+                return PublishPointCloud.Result(success=True, message=f"Successfully published point cloud for {zone_name}.")
         
         except Exception as e:
             self.get_logger().error(f"Failed to publish PCD file: {e}")
             
-            # If the goal is already canceled, don"t try to abort it again
+            # If the goal is already canceled, don't try to abort it again
             if goal_handle.is_cancel_requested:
                 self.get_logger().info("Goal was already canceled, no need to abort.")
-                goal_handle.canceled()
+                self.current_goal_handle = None  # Clear the current goal handle
                 return PublishPointCloud.Result(success=False, message="Goal was canceled due to an error.")
 
             # Only abort if the goal is still active
-            goal_handle.abort()
+            if goal_handle.is_active:
+                goal_handle.abort()
+            self.current_goal_handle = None  # Clear the current goal handle
             return PublishPointCloud.Result(success=False, message=str(e))
 
+    def check_cancel_condition(self, goal_handle: ServerGoalHandle):
+        if goal_handle and goal_handle.is_cancel_requested:
+            self.get_logger().info("Goal was canceled by external request.")
+            if goal_handle.is_active:
+                goal_handle.abort()
 
-    def publish_reduced_pointcloud(self, file_path, goal_handle: ServerGoalHandle):
+    def publish_reduced_pointcloud(self, file_path, goal_handle):
         points = []
-        total_points = 0
         with open(file_path, "r") as pcd_file:
             reading_points = False
             for line in pcd_file:
@@ -153,44 +170,66 @@ class PublishPointCloudServer(Node):
                     
         # Publish the point cloud
         self.publish_pointcloud2(points, file_path)
-    
-    async def publish_larger_pointcloud(self, file_path, goal_handle: ServerGoalHandle):
+
+    async def publish_larger_pointcloud(self, file_path, goal_handle):
         points = []
         total_points = 0
+        check_size = 1500000
         self.get_logger().info("Publishing pointcloud from larger PCD file.")
-        with open(file_path, "r") as pcd_file:
-            reading_points = False
-            for line in pcd_file:
-                
-                self.get_logger().info("Before asyncio.sleep.")
-                await asyncio.sleep(0.1)
-                self.get_logger().info("After asyncio.sleep.")
-                
-                if goal_handle.is_cancel_requested:
-                    self.get_logger().info("Goal has been canceled during file processing.")
-                    return
-                
-                if line.startswith("DATA"):
-                    reading_points = True
-                    continue
 
-                if reading_points:
-                    self.get_logger().info("Reading_points.")
-                    values = line.strip().split()
-                    x, y, z = map(float, values[:3])
-                    r, g, b = map(int, values[3:6])
-                    rgb = (r << 16) | (g << 8) | b
-                    points.append([x, y, z, rgb])
+        try:
+            with open(file_path, "r") as pcd_file:
+                reading_points = False
+                for line in pcd_file:
+                    # Check if a cancel request has been received
+                    if goal_handle.is_cancel_requested:
+                        self.get_logger().info("Goal has been canceled during file processing.")
+                        # Stop the timer and mark the goal as canceled
+                        if self.cancel_check_timer is not None:
+                            self.cancel_check_timer.cancel()
+                        goal_handle.canceled()
+                        return
+                    
+                    if line.startswith("DATA"):
+                        reading_points = True
+                        continue
 
-                total_points += 1
-                if total_points % 500000 == 0:
-                    feedback_msg = PublishPointCloud.Feedback()
-                    feedback_msg.progress = float(total_points)
-                    goal_handle.publish_feedback(feedback_msg)
-                
+                    if reading_points:
+                        values = line.strip().split()
+                        x, y, z = map(float, values[:3])
+                        r, g, b = map(int, values[3:6])
+                        rgb = (r << 16) | (g << 8) | b
+                        points.append([x, y, z, rgb])
 
-        if not goal_handle.is_cancel_requested:
-            self.publish_pointcloud2(points, file_path)
+                    total_points += 1
+                    if total_points % check_size == 0:
+                        # Check if a cancel request has been received again before publishing feedback
+                        if goal_handle.is_cancel_requested:
+                            self.get_logger().info("Goal has been canceled during feedback publication.")
+                            # Stop the timer and mark the goal as canceled
+                            if self.cancel_check_timer is not None:
+                                self.cancel_check_timer.cancel()
+                            goal_handle.canceled()
+                            return
+
+                        # Provide feedback on progress
+                        feedback_msg = PublishPointCloud.Feedback()
+                        feedback_msg.progress = float(total_points)
+                        goal_handle.publish_feedback(feedback_msg)
+                        
+                        await asyncio.sleep(0.0)  # Yield control to allow other tasks to run
+
+            # Final check for cancellation before publishing the point cloud
+            if not goal_handle.is_cancel_requested:
+                self.publish_pointcloud2(points, file_path)
+        
+        except Exception as e:
+            self.get_logger().error(f"Exception during point cloud publishing: {e}")
+            # Ensure the goal is marked appropriately if an exception occurs
+            if goal_handle.is_cancel_requested:
+                goal_handle.canceled()
+            elif goal_handle.is_active:
+                goal_handle.abort()
         
         
     def publish_pointcloud2(self, points, file_path):
