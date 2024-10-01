@@ -19,16 +19,20 @@ class PCDPublisher(Node):
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd"])
         
         self.declare_parameter("translation", [-100.0, -48.0, -0.12,
-                                                94.2, 297.05, 0.3, 
-                                                140.85, 598.8, 0.35])
+                                                94.10, 297.05, 0.32, 
+                                                140.70, 598.8, 0.188])
         
-        self.declare_parameter("euler_angles", [0.0, -0.135, -2.57])
+        self.declare_parameter("euler_angles", [0.0, -0.135, -2.57,
+                                                0.0, -0.15, -2.57,
+                                                -0.138, 0.0, -2.57])
         
         self.labels = ["A", "B", "C"]
         self.pcd_file_path = self.get_parameter("pcd_file_path").get_parameter_value().string_array_value
         translations_inline = self.get_parameter("translation").get_parameter_value().double_array_value
         self.translation = [translations_inline[i:i+3] for i in range(0, len(translations_inline), 3)]
-        self.euler_angles = [angle * math.pi / 180 for angle in self.get_parameter("euler_angles").get_parameter_value().double_array_value]
+        euler_inline = self.get_parameter("euler_angles").get_parameter_value().double_array_value
+        euler_radians = [angle * math.pi / 180 for angle in euler_inline]
+        self.euler_angles = [euler_radians[i:i+3] for i in range(0, len(euler_radians), 3)]
         
         # Define the PointCloud2 publisher and StaticTransformBroadcaster for TF Frames
         self.pointcloud_publishers = [self.create_publisher(PointCloud2, f"/marina_punat_zone_{self.labels[i]}", 10) for i in range(len(self.pcd_file_path))]
@@ -37,12 +41,12 @@ class PCDPublisher(Node):
         # Combine the static transform and point cloud publishing
         self.publish_pointclouds()
 
-    def generate_pointcloud_with_transform(self, pcd_file_path, frame_id, translation):
+    def generate_pointcloud_with_transform(self, pcd_file_path, frame_id, translation, euler_angles):
         # sourcery skip: inline-immediately-returned-variable
         
         try:
             # Broadcast static transform (once before publishing the point cloud)
-            rotation_angle = tf.quaternion_from_euler(self.euler_angles[0], self.euler_angles[1], self.euler_angles[2])
+            rotation_angle = tf.quaternion_from_euler(euler_angles[0], euler_angles[1], euler_angles[2])
             
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
@@ -102,7 +106,8 @@ class PCDPublisher(Node):
             pcd_file_path = self.pcd_file_path[i]
             frame_id = f"pointcloud_frame_zone_{self.labels[i]}"
             translation = self.translation[i]
-            point_cloud = self.generate_pointcloud_with_transform(pcd_file_path, frame_id, translation)
+            euler_angles = self.euler_angles[i]
+            point_cloud = self.generate_pointcloud_with_transform(pcd_file_path, frame_id, translation, euler_angles)
             self.pointcloud_publishers[i].publish(point_cloud)
             self.get_logger().info(f"Publishing PointCloud2 data: {pcd_file_path}")
         

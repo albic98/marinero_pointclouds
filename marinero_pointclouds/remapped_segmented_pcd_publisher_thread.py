@@ -26,14 +26,14 @@ class PCDPublisher(Node):
         self.zone_B = {
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_500K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_10M_remapped.pcd",
-            "euler_angles": [0.0, -0.135, -2.57],
-            "translation": [94.2, 297.05, 0.32],
+            "euler_angles": [0.0, -0.15, -2.57],
+            "translation": [94.10, 297.05, 0.32],
         }
         self.zone_C = {
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_200K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd",
-            "euler_angles": [0.0, 0.0, -2.57],
-            "translation": [140.85, 598.8, -0.12],
+            "euler_angles": [-0.138, 0.0, -2.57],
+            "translation": [140.70, 598.8, 0.188],
         }
         
         self.current_zone = None

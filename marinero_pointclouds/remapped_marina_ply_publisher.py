@@ -21,7 +21,7 @@ class PLYToPointCloud2(Node):
         
         self.declare_parameter("translation", [-100.0, -48.0, -0.12,
                                                 94.2, 297.05, 0.3, 
-                                                140.85, 598.8, 0.35])
+                                                140.85, 598.8, 0.188])
         
         self.declare_parameter("euler_angles", [0.0, -0.135, -2.57])
         
