@@ -19,11 +19,11 @@ class PCDPublisher(Node):
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd"])
         
         self.declare_parameter("translation", [-100.0, -48.0, -0.12,
-                                                94.10, 297.05, 0.32, 
+                                                94.10, 297.05, 0.25, 
                                                 140.70, 598.8, 0.188])
         
         self.declare_parameter("euler_angles", [0.0, -0.135, -2.57,
-                                                0.0, -0.15, -2.57,
+                                                0.0, -0.0725, -2.57,
                                                 -0.138, 0.0, -2.57])
         
         self.labels = ["A", "B", "C"]

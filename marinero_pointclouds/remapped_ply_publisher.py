@@ -20,7 +20,7 @@ class PLYToPointCloud2(Node):
         # self.declare_parameter("euler_angles", [0.0, -0.135, -2.57])
         
         # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.ply")
-        # self.declare_parameter("translation",[94.10, 297.05, 0.32])
+        # self.declare_parameter("translation",[94.10, 297.05, 0.25])
         #$ self.declare_parameter("euler_angles", [0.0, -0.15, -2.57])
         
         # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.ply")
