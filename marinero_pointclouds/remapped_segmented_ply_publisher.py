@@ -20,18 +20,18 @@ class PLYToPointCloud2(Node):
         
         self.zone_A = {
             "ply_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M_remapped.ply",
-            "euler_angles": [0.0, -0.135, -2.57],
-            "translation": [-100.0, -48.0, -0.12],
+            "euler_angles": [0.0, -0.135, 1.326],
+            "translation": [0.2, 0.14, -0.12],
         }
         self.zone_B = {
             "ply_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.ply",
-            "euler_angles": [0.0, -0.0725, -2.57],
-            "translation": [94.10, 297.05, 0.25],
+            "euler_angles": [0.0, -0.0725, 1.2402],
+            "translation": [170.45, 357.53, 0.25],
         }
         self.zone_C = {
             "ply_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.ply",
-            "euler_angles": [-0.138, 0.0, -2.57],
-            "translation": [140.70, 598.8, 0.188],
+            "euler_angles": [-0.138, 0.0, 1.355],
+            "translation": [196.85, 661.52, 0.175],
         }
         
         self.start_flag = 0
@@ -44,14 +44,15 @@ class PLYToPointCloud2(Node):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
             
-        zone_A_limit_1, zone_A_limit_2 = 250.0, 296.0
-        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 296.5, 598.0, 624.0
-        zone_C_limit = 598.5
-        zone_x_min, zone_x_max = -100, -95
+        zone_A_limit_1, zone_A_limit_2 = 301.0, 357.0
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 357.0, 661.1, 668.5
+        zone_C_limit = 661.1
+        zone_x_min_1, zone_x_max_1 = -23.25, -4.0
+        x_pose_condition_1 = zone_x_min_1 < self.pose_x < zone_x_max_1
+        zone_x_min_2, zone_x_max_2 = -44.0, -38.0
+        x_pose_condition_2 = zone_x_min_2 < self.pose_x < zone_x_max_2
         
-        x_pose_condition = zone_x_min < self.pose_x < zone_x_max
-        
-        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition:
+        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition_1:
             if self.current_zone != self.zone_B:
                 self.switch_to_zone(self.zone_B, "Opening zone B.")
                 
@@ -61,7 +62,7 @@ class PLYToPointCloud2(Node):
         elif zone_B_limit_1 <= self.pose_y < zone_B_limit_2 and self.current_zone != self.zone_B:
             self.switch_to_zone(self.zone_B, "Opening zone B.")
             
-        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition:
+        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition_2:
             if self.current_zone != self.zone_B:
                 self.switch_to_zone(self.zone_B, "Opening zone B.")
                 

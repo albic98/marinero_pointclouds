@@ -17,7 +17,7 @@ class PLYToPointCloud2(Node):
         super().__init__("ply_to_pointcloud2")
         self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M.ply")
         self.declare_parameter("euler_angles", [0.0, -0.135, -2.57])
-        self.declare_parameter("translation", [-100.0, -48.0, -0.12])
+        self.declare_parameter("translation", [0.2, 0.14, -0.12,])
         self.declare_parameter("origin", [352306.109894, 4989164.188812, 1.398855])
         
         self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_value

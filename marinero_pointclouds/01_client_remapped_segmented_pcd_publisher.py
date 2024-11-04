@@ -16,18 +16,36 @@ class PublishPointCloudClient(Node):
         self.success = True
         
         self.odom_subscriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
-        self.pointcloud_client_ = ActionClient(self, PublishPointCloud, "publish_pointcloud")
+        self.pointcloud_client_ = ActionClient(PublishPointCloud, "publish_pointcloud")
         self.get_logger().info("Action client has been started.")
     
     def odom_callback(self, msg):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
         
-        if self.pose_y < 296.0 and self.current_zone != "zone_A":
+        zone_A_limit_1, zone_A_limit_2 = 301.0, 357.0
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 357.0, 661.1, 668.5
+        zone_C_limit = 661.1
+        zone_x_min_1, zone_x_max_1 = -23.25, -4.0
+        x_pose_condition_1 = zone_x_min_1 < self.pose_x < zone_x_max_1
+        zone_x_min_2, zone_x_max_2 = -44.0, -38.0
+        x_pose_condition_2 = zone_x_min_2 < self.pose_x < zone_x_max_2
+        
+        if zone_A_limit_1 <= self.pose_y < zone_A_limit_2 and x_pose_condition_1:
+            if self.current_zone != "zone_B":
+                self.switch_to_zone("zone_B", "Opening zone B.")
+                
+        elif self.pose_y < zone_A_limit_2 and self.current_zone != "zone_A":
             self.switch_to_zone("zone_A", "Opening zone A.")
-        elif 296.0 <= self.pose_y < 598.0 and self.current_zone != "zone_B":
+            
+        elif zone_B_limit_1 <= self.pose_y < zone_B_limit_2 and self.current_zone != "zone_B":
             self.switch_to_zone("zone_B", "Opening zone B.")
-        elif self.pose_y > 598.0 and self.current_zone != "zone_C":
+            
+        elif zone_B_limit_2 <= self.pose_y < zone_B_limit_3 and x_pose_condition_2:
+            if self.current_zone != "zone_B":
+                self.switch_to_zone("zone_B", "Opening zone B.")
+                
+        elif self.pose_y > zone_C_limit and self.current_zone != "zone_C":
             self.switch_to_zone("zone_C", "Opening zone C.")
 
     def switch_to_zone(self, new_zone, log_message):
