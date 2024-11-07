@@ -19,17 +19,17 @@ class PLYToPointCloud2(Node):
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.ply",
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.ply"])
         
-        self.declare_parameter("euler_angles", [0.0, -0.135, 1.326,
-                                                0.0, -0.0725, 1.2402,
-                                                -0.138, 0.0, 1.441])
-        
         # self.declare_parameter("translation", [-100.0, -48.18, -0.12,
         #                                         94.10, 297.05, 0.25, 
         #                                         140.70, 598.88, 0.175])
 
+        self.declare_parameter("euler_angles", [0.0, -0.135, 1.326,
+                                                0.0, -0.0725, 1.3332,
+                                                -0.138, 0.0, 1.355])
+
         self.declare_parameter("translation", [0.2, 0.14, -0.12,
                                                 170.45, 357.53, 0.25, 
-                                                196.85, 661.52, 0.165])
+                                                196.435, 661.85, 0.165])
         
         self.labels = ["A", "B", "C"]
         self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_array_value

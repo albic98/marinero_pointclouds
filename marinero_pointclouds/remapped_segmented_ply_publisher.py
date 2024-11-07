@@ -25,13 +25,13 @@ class PLYToPointCloud2(Node):
         }
         self.zone_B = {
             "ply_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.ply",
-            "euler_angles": [0.0, -0.0725, 1.2402],
+            "euler_angles": [0.0, -0.0725, 1.3332],
             "translation": [170.45, 357.53, 0.25],
         }
         self.zone_C = {
             "ply_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.ply",
-            "euler_angles": [-0.138, 0.0, 1.441],
-            "translation": [196.85, 661.52, 0.165],
+            "euler_angles": [-0.138, 0.0, 1.355],
+            "translation": [196.435, 661.85, 0.165],
         }
         
         self.start_flag = 0
