@@ -48,8 +48,8 @@ class PCDPublisher(Node):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y
 
-        zone_A_limit_1, zone_A_limit_2 = 301.0, 357.0
-        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 357.0, 661.1, 668.5
+        zone_A_limit_1, zone_A_limit_2 = 301.0, 357.45
+        zone_B_limit_1, zone_B_limit_2, zone_B_limit_3 = 357.45, 661.1, 668.5
         zone_C_limit = 661.1
         zone_x_min_1, zone_x_max_1 = -23.25, -4.0
         x_pose_condition_1 = zone_x_min_1 < self.pose_x < zone_x_max_1
