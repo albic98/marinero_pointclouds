@@ -14,8 +14,8 @@ class PCDPublisher(Node):
     def __init__(self):
         super().__init__("pcd_publisher")
 
-        self.declare_parameter("pcd_file_path", ["/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M_remapped.pcd",
-                                                "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.pcd",
+        self.declare_parameter("pcd_file_path", ["/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_10M_remapped.pcd",
+                                                "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M_remapped.pcd",
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd"])
         
         self.declare_parameter("euler_angles", [0.0, -0.135, 1.326,

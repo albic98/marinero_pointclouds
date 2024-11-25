@@ -30,7 +30,7 @@ class PublishPointCloudServer(Node):
             },
             "zone_B": {
                 "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_500K_remapped.pcd",
-                "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_10M_remapped.pcd",
+                "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M_remapped.pcd",
                 "euler_angles": [0.0, -0.0725, 1.3332],
                 "translation": [170.45, 357.53, 0.25],
             },

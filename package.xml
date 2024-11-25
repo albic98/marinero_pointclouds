@@ -3,7 +3,7 @@
 <package format="3">
   <name>marinero_pointclouds</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Pointcloud segmentation and visualization in RViz</description>
   <maintainer email="albert.androsic2@gmail.com">albert</maintainer>
   <license>TODO: License declaration</license>
 

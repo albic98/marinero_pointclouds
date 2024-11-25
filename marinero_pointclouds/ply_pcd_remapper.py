@@ -8,11 +8,11 @@ class PLYRemappper(Node):
     def __init__(self):
         super().__init__("ply_remapper")
         
-        self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C.ply")
-        self.declare_parameter("origin", [352306.109894, 4989164.188812, 1.398855])
+        # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C.ply")
+        # self.declare_parameter("origin", [352306.109894, 4989164.188812, 1.398855])
         
-        # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_500K.ply")
-        # self.declare_parameter("origin", [352484.570892, 4989517.552795, 0.948855])
+        self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M.ply")
+        self.declare_parameter("origin", [352484.570892, 4989517.552795, 0.948855])
         
         # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_10M.ply")
         # self.declare_parameter("origin", [352517.591919, 4989821.112793, 0.925855])
@@ -126,7 +126,8 @@ class PLYRemappper(Node):
                 
                 # Write point data (x, y, z, r, g, b)
                 for i in range(num_points):
-                    pcd_file.write(f"{self.pcd_data["x"][i]:.6f} {self.pcd_data["y"][i]:.6f} {self.pcd_data["z"][i]:.6f} {self.pcd_data["r"][i]} {self.pcd_data["g"][i]} {self.pcd_data["b"][i]}\n")
+                    pcd_file.write(f"{self.pcd_data['x'][i]:.6f} {self.pcd_data['y'][i]:.6f} {self.pcd_data['z'][i]:.6f} {self.pcd_data['r'][i]} {self.pcd_data['g'][i]} {self.pcd_data['b'][i]}\n")
+                    # pcd_file.write(f"{self.pcd_data["x"][i]:.6f} {self.pcd_data["y"][i]:.6f} {self.pcd_data["z"][i]:.6f} {self.pcd_data["r"][i]} {self.pcd_data["g"][i]} {self.pcd_data["b"][i]}\n")
     
             self.get_logger().info(f"New PCD file saved at: {output_pcd_file_path}")
             
