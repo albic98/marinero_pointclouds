@@ -18,19 +18,21 @@ class PLYToPointCloud2(Node):
         self.declare_parameter("ply_file_path", ["/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M_remapped.ply",
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.ply",
                                                 "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.ply"])
-        
+
         # self.declare_parameter("translation", [-100.0, -48.18, -0.12,
         #                                         94.10, 297.05, 0.25, 
         #                                         140.70, 598.88, 0.175])
 
         self.declare_parameter("euler_angles", [0.0, -0.135, 1.326,
                                                 0.0, -0.0725, 1.3332,
-                                                -0.138, 0.0, 1.355])
+                                                -0.138, 0.0, 1.355
+                                            ])
 
-        self.declare_parameter("translation", [0.2, 0.14, -0.12,
-                                                170.45, 357.53, 0.25, 
-                                                196.435, 661.85, 0.165])
-        
+        self.declare_parameter("translation", [0.2, 0.14, -1.38, # -0.12,
+                                                170.45, 357.53, -1.01, # 0.25, 
+                                                196.435, 661.85, -1.095, # 0.165
+                                            ])
+
         self.labels = ["A", "B", "C"]
         self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_array_value
         translations_inline = self.get_parameter("translation").get_parameter_value().double_array_value
@@ -38,16 +40,16 @@ class PLYToPointCloud2(Node):
         euler_inline = self.get_parameter("euler_angles").get_parameter_value().double_array_value
         euler_radians = [angle * math.pi / 180 for angle in euler_inline]
         self.euler_angles = [euler_radians[i:i+3] for i in range(0, len(euler_radians), 3)]
-        
+
         self.pointcloud_publishers = [self.create_publisher(PointCloud2, f"/marina_punat_zone_{self.labels[i]}", 10) for i in range(len(self.ply_file_path))]
-        
+
         self.tf_broadcaster = StaticTransformBroadcaster(self)
-        
+
         self.publish_pointclouds()
-    
+
     def static_transform_publisher(self, frame_id, translation, euler_angles):
         rotation_angle = tf.quaternion_from_euler(euler_angles[0], euler_angles[1], euler_angles[2])
-        
+
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
         t.header.frame_id = "world"
@@ -60,8 +62,8 @@ class PLYToPointCloud2(Node):
         t.transform.rotation.z = rotation_angle[2]
         t.transform.rotation.w = rotation_angle[3]
         self.tf_broadcaster.sendTransform(t)
-    
-    
+
+
     def ply_to_pointcloud2(self, frame_id, ply_file_path):
         try:
             # Load the ply file
@@ -86,10 +88,10 @@ class PLYToPointCloud2(Node):
             header = Header()
             header.stamp = self.get_clock().now().to_msg()
             header.frame_id = frame_id
-            
+
             # Calculate point step (total size of one point in bytes)
             point_step = 36  # 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4
-            
+
             point_cloud = PointCloud2()
             point_cloud.header = header
             point_cloud.height = 1
@@ -110,7 +112,7 @@ class PLYToPointCloud2(Node):
             point_cloud.row_step = point_step * points.shape[0]
             point_cloud.data = points.tobytes()
             point_cloud.is_dense = True
-            
+
             self.get_logger().info(f"Generated pointcloud: {ply_file_path}")
 
             return point_cloud
@@ -118,7 +120,7 @@ class PLYToPointCloud2(Node):
         except Exception as e:
             self.get_logger().error(f"Failed to read PLY file: {e}")
             return None
-        
+
 
     def publish_pointclouds(self):
         for i in range(len(self.ply_file_path)):
@@ -126,12 +128,12 @@ class PLYToPointCloud2(Node):
             translation = self.translation[i]
             euler_angles = self.euler_angles[i]
             frame_id = f"pointcloud_frame_zone_{self.labels[i]}"
-            
+
             self.static_transform_publisher(frame_id, translation, euler_angles)
             point_cloud = self.ply_to_pointcloud2(frame_id, ply_file_path)
             if point_cloud:
                 self.pointcloud_publishers[i].publish(point_cloud)
-        
+
 
 def main(args=None):
     

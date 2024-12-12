@@ -21,19 +21,19 @@ class PCDPublisher(Node):
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_500K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_10M_remapped.pcd",
             "euler_angles": [0.0, -0.135, 1.326],
-            "translation": [0.2, 0.14, -0.12],
+            "translation": [0.2, 0.14, -1.38] # -0.12],
         }
         self.zone_B = {
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_500K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M_remapped.pcd",
             "euler_angles": [0.0, -0.0725, 1.3332],
-            "translation": [170.45, 357.53, 0.25],
+            "translation": [170.45, 357.53, -1.01] # 0.25],
         }
         self.zone_C = {
             "reduced_pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_200K_remapped.pcd",
             "pcd_file_path": "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd",
             "euler_angles": [-0.138, 0.0, 1.355],
-            "translation": [196.435, 661.85, 0.165],
+            "translation": [196.435, 661.85, -1.095] # 0.165],
         }
         
         self.current_zone = None
