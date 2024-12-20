@@ -52,7 +52,7 @@ class PCDPublisher(Node):
             
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = "world"
+            t.header.frame_id = "map"
             t.child_frame_id = frame_id
             t.transform.translation.x = translation[0]
             t.transform.translation.y = translation[1]

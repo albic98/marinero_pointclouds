@@ -129,11 +129,11 @@ class PCDPublisher(Node):
             rotation_angle = tf.quaternion_from_euler(self.euler_angles[0], self.euler_angles[1], self.euler_angles[2])
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = "world"
+            t.header.frame_id = "map"
             t.child_frame_id = "pointcloud_frame"
             t.transform.translation.x = self.translation[0]
             t.transform.translation.y = self.translation[1]
-            t.transform.translation.z = self.translation[2]
+            t.transform.translation.z = self.translation[2] + 1.26
             t.transform.rotation.x = rotation_angle[0]
             t.transform.rotation.y = rotation_angle[1]
             t.transform.rotation.z = rotation_angle[2]
@@ -174,7 +174,7 @@ class PCDPublisher(Node):
 
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = "world"
+            t.header.frame_id = "map"
             t.child_frame_id = "pointcloud_frame"
             t.transform.translation.x = self.translation[0]
             t.transform.translation.y = self.translation[1]
