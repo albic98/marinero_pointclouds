@@ -29,8 +29,7 @@ class PLYToPointCloud2(Node):
         self.tf_broadcaster = StaticTransformBroadcaster(self)
         self.publish_pointcloud()
         # self.timer = self.create_timer(2.0, self.publish_pointcloud)
-    
-    
+
     def static_transform_publisher(self):
         rotation_angle = tf.quaternion_from_euler(self.euler_angles[0], self.euler_angles[1], self.euler_angles[2])
         
@@ -46,8 +45,8 @@ class PLYToPointCloud2(Node):
         t.transform.rotation.z = rotation_angle[2]
         t.transform.rotation.w = rotation_angle[3]
         self.tf_broadcaster.sendTransform(t)
-    
-    
+
+
     def ply_to_pointcloud2(self):
         # sourcery skip: inline-immediately-returned-variable
         try:
@@ -56,7 +55,7 @@ class PLYToPointCloud2(Node):
 
             # Extract vertex data
             vertex = ply_data["vertex"]
-            
+
             # Define the origin point
             origin_x, origin_y, origin_z = self.origin
 
@@ -102,21 +101,20 @@ class PLYToPointCloud2(Node):
             point_cloud.is_dense = True
 
             return point_cloud
-        
+
         except Exception as e:
             self.get_logger().error(f"Failed to read PLY file: {e}")
             return None
-        
+
 
     def publish_pointcloud(self):
         self.static_transform_publisher()
         point_cloud = self.ply_to_pointcloud2()
         if point_cloud:
             self.pointcloud_publisher.publish(point_cloud)
-        
+
 
 def main(args=None):
-    
     rclpy.init(args=args)
     node = PLYToPointCloud2()
     rclpy.spin(node)
