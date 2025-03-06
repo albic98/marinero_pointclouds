@@ -133,7 +133,7 @@ class PCDPublisher(Node):
             t.child_frame_id = "pointcloud_frame"
             t.transform.translation.x = self.translation[0]
             t.transform.translation.y = self.translation[1]
-            t.transform.translation.z = self.translation[2] + 1.26
+            t.transform.translation.z = self.translation[2]
             t.transform.rotation.x = rotation_angle[0]
             t.transform.rotation.y = rotation_angle[1]
             t.transform.rotation.z = rotation_angle[2]
