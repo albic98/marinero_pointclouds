@@ -8,13 +8,13 @@ class PLYRemappper(Node):
     def __init__(self):
         super().__init__("ply_remapper")
         
-        # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C.ply")
+        # self.declare_parameter("ply_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_C.ply")
         # self.declare_parameter("origin", [352306.109894, 4989164.188812, 1.398855])
         
-        self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M.ply")
+        self.declare_parameter("ply_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_B_15M.ply")
         self.declare_parameter("origin", [352484.570892, 4989517.552795, 0.948855])
         
-        # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_10M.ply")
+        # self.declare_parameter("ply_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_C_10M.ply")
         # self.declare_parameter("origin", [352517.591919, 4989821.112793, 0.925855])
 
         self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_value

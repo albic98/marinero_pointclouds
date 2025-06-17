@@ -15,7 +15,7 @@ from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 class PLYToPointCloud2(Node):
     def __init__(self):
         super().__init__("ply_to_pointcloud2")
-        self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M.ply")
+        self.declare_parameter("ply_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_A_6M.ply")
         self.declare_parameter("euler_angles", [0.0, -0.135, 1.326])
         self.declare_parameter("translation", [0.2, 0.14, -1.38]) # -0.12])
         self.declare_parameter("origin", [352306.109894, 4989164.188812, 1.398855])

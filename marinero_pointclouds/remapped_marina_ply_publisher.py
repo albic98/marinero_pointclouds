@@ -34,7 +34,7 @@ class PLYToPointCloud2(Node):
                                             ])
 
         self.labels = ["A", "B", "C"]
-        self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_array_value
+        self.ply_file_path = list(self.get_parameter("ply_file_path").get_parameter_value().string_array_value)
         translations_inline = self.get_parameter("translation").get_parameter_value().double_array_value
         self.translation = [translations_inline[i:i+3] for i in range(0, len(translations_inline), 3)]
         euler_inline = self.get_parameter("euler_angles").get_parameter_value().double_array_value

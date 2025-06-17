@@ -39,7 +39,7 @@ class PLYToPointCloud2(Node):
         self.pose_subsriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
-        
+
     def odom_callback(self, msg):
         self.pose_x = msg.pose.pose.position.x
         self.pose_y = msg.pose.pose.position.y

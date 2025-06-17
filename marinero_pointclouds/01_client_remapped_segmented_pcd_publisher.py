@@ -16,7 +16,7 @@ class PublishPointCloudClient(Node):
         self.success = True
         
         self.odom_subscriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
-        self.pointcloud_client_ = ActionClient(PublishPointCloud, "publish_pointcloud")
+        self.pointcloud_client_ = ActionClient(self, PublishPointCloud, "publish_pointcloud")
         self.get_logger().info("Action client has been started.")
     
     def odom_callback(self, msg):

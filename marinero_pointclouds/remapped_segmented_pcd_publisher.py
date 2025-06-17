@@ -35,8 +35,8 @@ class PCDPublisher(Node):
             "euler_angles": [-0.138, 0.0, 1.355],
             "translation": [196.435, 661.85, -1.095] # 0.165],
         }
-        
-        self.current_zone = None
+
+        self.current_zone = self.zone_A
         self.reduced_pcd_published = False
         self.large_pcd_published = False
 

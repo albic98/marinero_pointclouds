@@ -17,22 +17,22 @@ class PCDPublisher(Node):
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
 
-        # self.declare_parameter("ply_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_6M_remapped.ply")
+        # self.declare_parameter("ply_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_A_6M_remapped.ply")
         # self.declare_parameter("translation", [0.2, 0.14, -1.38]) # -0.12])
         # self.declare_parameter("euler_angles", [0.0, -0.135, 1.326])
         
-        # self.declare_parameter("pcd_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_6M_remapped.pcd")
+        # self.declare_parameter("pcd_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_B_6M_remapped.pcd")
         # self.declare_parameter("translation", [170.45, 357.53, -1.01]) # 0.25])
         # self.declare_parameter("euler_angles", [0.0, -0.0725, 1.3332])
-        
-        # self.declare_parameter("pcd_file_path", "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd")
+
+        # self.declare_parameter("pcd_file_path", "/home/albert/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd")
         # self.declare_parameter("translation", [196.435, 661.85, -1.095]) # 0.165])
         # self.declare_parameter("euler_angles", [-0.138, 0.0, 1.177])
-        
+
         self.pcd_file_path = self.get_parameter("pcd_file_path").get_parameter_value().string_value
         self.translation = self.get_parameter("translation").get_parameter_value().double_array_value
         self.euler_angles = [angle * math.pi / 180 for angle in self.get_parameter("euler_angles").get_parameter_value().double_array_value]
-        
+
         # Combine the static transform and point cloud publishing
         self.publish_pointcloud_with_transform()
 
