@@ -14,10 +14,10 @@ class PCDPublisher(Node):
     def __init__(self):
         super().__init__("pcd_publisher")
 
-        self.declare_parameter("pcd_file_path", ["/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_A_10M_remapped.pcd",
-                                                "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_B_15M_remapped.pcd",
-                                                "/home/albert/marinero_ws/src/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd"])
-        
+        self.declare_parameter("pcd_file_path", ["/home/albert/LIDAR_data/Marina_Punat_zona_A_10M_remapped.pcd",
+                                                "/home/albert/LIDAR_data/Marina_Punat_zona_B_15M_remapped.pcd",
+                                                "/home/albert/LIDAR_data/Marina_Punat_zona_C_6M_remapped.pcd"])
+
         self.declare_parameter("euler_angles", [0.0, -0.135, 1.326,
                                                 0.0, -0.0725, 1.3332,
                                                 -0.138, 0.0, 1.355
@@ -27,7 +27,7 @@ class PCDPublisher(Node):
                                                 170.45, 357.53, -1.01, # 0.25, 
                                                 196.435, 661.85, -1.095, # 0.165
                                             ])
-        
+
         self.labels = ["A", "B", "C"]
         self.pcd_file_path = list(self.get_parameter("pcd_file_path").get_parameter_value().string_array_value)
         translations_inline = self.get_parameter("translation").get_parameter_value().double_array_value
