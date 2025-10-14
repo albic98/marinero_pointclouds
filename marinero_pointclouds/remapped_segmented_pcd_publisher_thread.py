@@ -38,6 +38,7 @@ class PCDPublisher(Node):
         self.current_zone = self.zone_A  # Start in zone A
         self.reduced_pcd_published = False
         self.large_pcd_published = False
+        self.repeat_pointcloud2_flag = False
 
         self.stop_current_publishing = False  # Flag to stop current publishing thread
         self.publish_thread = None  # Store the thread for publishing
@@ -45,6 +46,9 @@ class PCDPublisher(Node):
         self.pose_subsriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
+        
+        self.create_timer(60.0, self.large_pointcloud2_repeater)
+
 
     def odom_callback(self, msg):
         self.pose_x = msg.pose.pose.position.x
@@ -89,11 +93,18 @@ class PCDPublisher(Node):
             # self.get_logger().info("Publishing reduced PCD file.")
             self.reduced_pointcloud2_publisher(self.reduced_pcd_file_path)
             self.reduced_pcd_published = True
+            self.repeat_pointcloud2_flag = False
         
         if not self.large_pcd_published:
             # self.get_logger().info("Publishing larger PCD file.")
             self._large_pointcloud2_publisher(self.pcd_file_path)
             self.large_pcd_published = True
+            self.repeat_pointcloud2_flag = True
+
+    def large_pointcloud2_repeater(self):
+        if self.repeat_pointcloud2_flag:
+            self.large_pointcloud2_publisher(self.pcd_file_path)
+            # self.get_logger().info(f"Republishing current zone: {self.current_zone['pcd_file_path']}")
 
     def switch_to_zone(self, new_zone, log_message):
         self.current_zone = new_zone
@@ -101,13 +112,13 @@ class PCDPublisher(Node):
         self.reduced_pcd_published = False
         self.large_pcd_published = False
         self.get_logger().info(log_message)
-        
+
     def declare_parameter_if_not_declared(self, param_name, value):
         if not self.has_parameter(param_name):
             self.declare_parameter(param_name, value)
         else:
             self.set_parameters([Parameter(param_name, Parameter.Type.from_parameter_value(value), value)])
-    
+
     def _large_pointcloud2_publisher(self, file_path):
         # Stop any ongoing publishing thread
         if self.publish_thread is not None and self.publish_thread.is_alive():
@@ -120,8 +131,8 @@ class PCDPublisher(Node):
         # Start a new thread to publish the point cloud
         self.publish_thread = threading.Thread(target=self.large_pointcloud2_publisher, args=(file_path,))
         self.publish_thread.start()
-        
-        
+
+
     def reduced_pointcloud2_publisher(self, file_path):
         try:
             # Broadcast static transform (once before publishing the point cloud)
