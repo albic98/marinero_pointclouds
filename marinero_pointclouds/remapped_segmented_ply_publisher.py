@@ -36,6 +36,7 @@ class PLYToPointCloud2(Node):
         
         self.start_flag = 0
         self.current_zone = None
+        self.previous_zone = None
         self.pose_subsriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
         self.pointcloud_publisher = self.create_publisher(PointCloud2, "/marina_punat_pc", 10)
         self.tf_broadcaster = StaticTransformBroadcaster(self)
@@ -69,9 +70,9 @@ class PLYToPointCloud2(Node):
         elif self.pose_y > zone_C_limit and self.current_zone != self.zone_C:
             self.switch_to_zone(self.zone_C, "Opening zone C.")
         
-        self.declare_parameter_if_not_declared("ply_file_path", self.zone["ply_file_path"])
-        self.declare_parameter_if_not_declared("euler_angles", self.zone["euler_angles"])
-        self.declare_parameter_if_not_declared("translation", self.zone["translation"])
+        self.declare_parameter_if_not_declared("ply_file_path", self.current_zone["ply_file_path"]) # type: ignore
+        self.declare_parameter_if_not_declared("euler_angles", self.current_zone["euler_angles"])   # type: ignore
+        self.declare_parameter_if_not_declared("translation", self.current_zone["translation"])     # type: ignore
 
         self.ply_file_path = self.get_parameter("ply_file_path").get_parameter_value().string_value
         self.euler_angles = [angle * math.pi / 180 for angle in self.get_parameter("euler_angles").get_parameter_value().double_array_value]
@@ -166,7 +167,7 @@ class PLYToPointCloud2(Node):
 
     def publish_pointcloud(self):
         point_cloud = self.ply_to_pointcloud2()
-        if point_cloud and self.zone != self.previous_zone:
+        if point_cloud and self.current_zone != self.previous_zone:
             self.pointcloud_publisher.publish(point_cloud)
             self.get_logger().info(f"Generated pointcloud: {self.ply_file_path}")
         

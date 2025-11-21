@@ -55,14 +55,6 @@ Replace `/path/to/LIDAR_data/` with the absolute or relative path to the directo
 
 ---
 
-## Support
-
-The required .pcd files are not included in this repository due to size limitations.
-
-For support, email albert.androsic@fsb.unizg.hr.
-
----
-
 ## Usage/Examples
 
 Run the nodes as follows:
@@ -79,10 +71,37 @@ ros2 run marinero_pointclouds remapped_marina_pcd_publisher
 
 ---
 
-## Connection to the MARINERO simulations repository
+## Script overview
+
+This scripts are not used in the current version of simulation but some of these can be replace the current script that is being used: `remapped_segmented_pcd_publisher_thread.py`
+
+- `01_client_remapped_segmented_pcd_publisher.py` - Client script using a service to publish marina zones depending on robot location
+
+- `01_server_remapped_segmented_pcd_publisher.py` - Server script for segmented zone publishing
+
+- `ply_publisher.py` - Deprecated: publishes a single .ply file.
+
+- `remapped_pcd_publisher.py` - Deprecated: publishes a single .pcd file from the **LIDAR_data** folder
+
+- `remapped_ply_publisher.py` - Deprecated: publishes a single .ply file from the **LIDAR_data** folder.
+
+- `remapped_segmented_pcd_publisher.py` - Similar to `remapped_segmented_pcd_publisher_thread.py`, but less effective as it does not use **threading**
+
+- `remapped_segmented_ply_publisher.py` - Similar to `remapped_segmented_pcd_publisher.py`, but for .ply files
+
+---
+
+## Integration with MARINERO Simulations
 
 The node `remapped_segmented_pcd_publisher_thread.py` is automatically launched through  
 `gazebo_simulation.launch.py` in the [marinero_simulations](https://github.com/albic98/marinero_simulations) package.  
-This means you don’t need to run it manually when starting the full simulation.
 
+You **do not** need to launch it manually when running the full simulation.
 
+---
+
+## Support
+
+The required .pcd files are not included in this repository due to size limitations.
+
+For support, email albert.androsic@fsb.unizg.hr.

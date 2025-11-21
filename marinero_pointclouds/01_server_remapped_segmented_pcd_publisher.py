@@ -85,8 +85,8 @@ class PublishPointCloudServer(Node):
         
         try:
             # Get the translation and rotation
-            translation = zone_config["translation"]
-            euler_angles = [angle * math.pi / 180 for angle in zone_config["euler_angles"]]
+            translation = zone_config["translation"]                                            # type: ignore
+            euler_angles = [angle * math.pi / 180 for angle in zone_config["euler_angles"]]     # type: ignore
             rotation_angle = quaternion_from_euler(*euler_angles)
 
             # Broadcast the static transform
@@ -103,7 +103,7 @@ class PublishPointCloudServer(Node):
             t.transform.rotation.w = rotation_angle[3]
             self.tf_broadcaster.sendTransform(t)
             
-            self.publish_reduced_pointcloud(zone_config["reduced_pcd_file_path"], goal_handle)
+            self.publish_reduced_pointcloud(zone_config["reduced_pcd_file_path"], goal_handle)                  # type: ignore
             
             # Check if the goal was canceled before proceeding
             if goal_handle.is_cancel_requested:
@@ -114,7 +114,7 @@ class PublishPointCloudServer(Node):
 
             # Start the timer to check for cancel requests
             self.cancel_check_timer = self.create_timer(0.1, lambda: self.check_cancel_condition(goal_handle))
-            await self.publish_larger_pointcloud(zone_config["pcd_file_path"], goal_handle)
+            await self.publish_larger_pointcloud(zone_config["pcd_file_path"], goal_handle)                     # type: ignore  
         
             # Stop the timer after processing is complete
             self.cancel_check_timer.cancel()

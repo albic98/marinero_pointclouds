@@ -12,7 +12,7 @@ class PublishPointCloudClient(Node):
         super().__init__("publish_pointcloud_client")
         
         self.current_zone = None
-        self.goal_handle = None
+        self.goal_handle = None     # type: ignore
         self.success = True
         
         self.odom_subscriber = self.create_subscription(Odometry, "/marinero/odom", self.odom_callback, 50)
@@ -66,7 +66,7 @@ class PublishPointCloudClient(Node):
         self.pointcloud_client_.send_goal_async(goal_msg, feedback_callback=self.feedback_callback).add_done_callback(self.goal_response_callback)
     
     def goal_response_callback(self, future):
-        self.goal_handle = None
+        self.goal_handle = None  # type: ignore
         self.goal_handle: ClientGoalHandle = future.result()
         if self.goal_handle.accepted:
             self.get_logger().info(f"Goal accepted.")
