@@ -104,4 +104,4 @@ You **do not** need to launch it manually when running the full simulation.
 
 The required .pcd files are not included in this repository due to size limitations.
 
-For support, email albert.androsic@fsb.unizg.hr.
+For support, go to https://github.com/CRTA-Lab/marinero_stack.

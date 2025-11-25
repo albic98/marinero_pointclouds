@@ -7,22 +7,40 @@
   <maintainer email="albert.androsic2@gmail.com">albert</maintainer>
   <license>TODO: License declaration</license>
 
-  <depend>rclpy</depend>
-  <depend>publish_pointcloud_interfaces</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
 
+  <build_depend>rclpy</build_depend>
+  <build_depend>publish_pointcloud_interfaces</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf_transformations</build_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>publish_pointcloud_interfaces</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>tf_transformations</exec_depend>
   <exec_depend>trajectory_msgs</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
-  <exec_depend>tf2_ros</exec_depend> 
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>pytest</test_depend>
 
   <export>
     <build_type>ament_python</build_type>
